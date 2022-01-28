@@ -1,0 +1,127 @@
+<template>
+  <Layout>
+    <template v-slot:layout-content>
+      <v-row id="title" justify="space-between">
+        <v-col cols="auto">
+          <slot name="title-info"></slot>
+        </v-col>
+        <v-col cols="auto">
+          <slot name="user-info"> </slot>
+        </v-col>
+      </v-row>
+      <v-row
+        :style="isItSmall ? `margin-bottom:116px` : `padding-bottom:20px`"
+        justify="center"
+      >
+        <v-col cols="10">
+          <v-card outlined>
+            <v-data-table
+              hide-default-footer
+              :headers="headers"
+              :items="penaltys"
+              :search="search"
+              :hide-default-header="false"
+              outlined
+            >
+              <template v-slot:[`item.User`]="{ item }">
+                <router-link :to="`/user/${item.UserId}`">
+                  <v-avatar size="28px">
+                    <img :src="item.User.img" />
+                  </v-avatar>
+                  <span class="ml-2 black--text">{{ item.User.name }}</span>
+                </router-link>
+              </template>
+              <template v-slot:[`item.payed`]="{ item, index }">
+                <v-btn
+                  fab
+                  x-small
+                  readOnly
+                  icon
+                  :color="item.payed ? 'success' : 'red'"
+                  @click="setPaid(index, item.id)"
+                  v-if="amIAdmin"
+                >
+                  <v-icon icon>{{
+                    item.payed ? "mdi mdi-check" : "mdi mdi-close"
+                  }}</v-icon>
+                </v-btn>
+                <v-icon icon v-else :color="item.payed ? 'success' : 'red'">{{
+                  item.payed ? "mdi mdi-check" : "mdi mdi-close"
+                }}</v-icon>
+              </template>
+            </v-data-table>
+          </v-card>
+        </v-col>
+      </v-row>
+    </template>
+    <template v-slot:layout-subContent>
+      <span>asd</span>
+    </template>
+  </Layout>
+</template>
+
+<script lang="ts">
+import Vue from "vue";
+import Layout from "../components/Layout.vue";
+import { penaltyApi } from "../api";
+import Penalty from "../types/penalty";
+export default Vue.extend({
+  components: {
+    Layout,
+  },
+  data() {
+    return {
+      search: "",
+      headers: [
+        {
+          text: "유저",
+          align: "start",
+          filterable: false,
+          value: "User",
+        },
+        { text: "벌금", value: "paper" },
+        { text: "Payed", value: "payed" },
+      ],
+      penaltys: [] as Penalty[],
+    };
+  },
+  async created() {
+    try {
+      const { data } = await penaltyApi.getPenaltys();
+      this.penaltys = data.meta;
+    } catch (e) {
+      console.log(e);
+    }
+  },
+  computed: {
+    isItSmall(): boolean {
+      return this.$vuetify.breakpoint.smAndDown;
+    },
+    amIAdmin(): boolean {
+      return this.$store.state.user.admin;
+    },
+  },
+  methods: {
+    async setPaid(id: number, penaltyId: number) {
+      try {
+        const { data } = await penaltyApi.checkPaid(
+          penaltyId,
+          !this.penaltys[id].payed
+        );
+        this.penaltys.splice(id, 1, {
+          ...this.penaltys[id],
+          payed: !this.penaltys[id].payed,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    },
+  },
+});
+</script>
+
+<style scoped>
+a {
+  text-decoration: none;
+}
+</style>
