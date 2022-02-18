@@ -9,53 +9,72 @@
           <slot name="user-info"> </slot>
         </v-col>
       </v-row>
-      <v-row
-        :style="isItSmall ? `margin-bottom:116px` : `padding-bottom:20px`"
-        justify="center"
-      >
-        <v-col cols="10">
-          <v-card outlined>
-            <v-data-table
-              hide-default-footer
-              :headers="headers"
-              :items="penaltys"
-              :search="search"
-              :hide-default-header="false"
-              outlined
-            >
-              <template v-slot:[`item.User`]="{ item }">
-                <router-link :to="`/user/${item.UserId}`">
-                  <v-avatar size="28px">
-                    <img :src="item.User.img" />
-                  </v-avatar>
-                  <span class="ml-2 black--text">{{ item.User.name }}</span>
-                </router-link>
-              </template>
-              <template v-slot:[`item.payed`]="{ item, index }">
-                <v-btn
-                  fab
-                  x-small
-                  readOnly
-                  icon
-                  :color="item.payed ? 'success' : 'red'"
-                  @click="setPaid(index, item.id)"
-                  v-if="amIAdmin"
-                >
-                  <v-icon icon>{{
+
+      <template v-if="penaltys != null">
+        <v-row
+          :style="isItSmall ? `margin-bottom:116px` : `padding-bottom:20px`"
+          justify="center"
+        >
+          <v-col cols="10">
+            <v-card outlined>
+              <v-data-table
+                hide-default-footer
+                :headers="headers"
+                :items="penaltys"
+                :search="search"
+                :hide-default-header="false"
+                outlined
+              >
+                <template v-slot:[`item.User`]="{ item }">
+                  <router-link :to="`/user/${item.UserId}`">
+                    <v-avatar size="28px">
+                      <img :src="item.User.img" />
+                    </v-avatar>
+                    <span class="ml-2 black--text">{{ item.User.name }}</span>
+                  </router-link>
+                </template>
+                <template v-slot:[`item.payed`]="{ item, index }">
+                  <v-btn
+                    fab
+                    x-small
+                    readOnly
+                    icon
+                    :color="item.payed ? 'success' : 'red'"
+                    @click="setPaid(index, item.id)"
+                    v-if="amIAdmin"
+                  >
+                    <v-icon icon>{{
+                      item.payed ? "mdi mdi-check" : "mdi mdi-close"
+                    }}</v-icon>
+                  </v-btn>
+                  <v-icon icon v-else :color="item.payed ? 'success' : 'red'">{{
                     item.payed ? "mdi mdi-check" : "mdi mdi-close"
                   }}</v-icon>
-                </v-btn>
-                <v-icon icon v-else :color="item.payed ? 'success' : 'red'">{{
-                  item.payed ? "mdi mdi-check" : "mdi mdi-close"
-                }}</v-icon>
-              </template>
-            </v-data-table>
-          </v-card>
-        </v-col>
-      </v-row>
+                </template>
+              </v-data-table>
+            </v-card>
+          </v-col>
+        </v-row>
+      </template>
+      <template v-else>
+        <div
+          class="mt-6 d-flex justify-center pt-8"
+          style="margin-bottom: 68px"
+        >
+          <v-progress-circular
+            indeterminate
+            color="primary"
+            :size="70"
+            :width="7"
+          ></v-progress-circular>
+        </div>
+      </template>
     </template>
     <template v-slot:layout-subContent>
       <span>asd</span>
+    </template>
+    <template v-slot:upload>
+      <upload />
     </template>
   </Layout>
 </template>
@@ -65,9 +84,12 @@ import Vue from "vue";
 import Layout from "../components/Layout.vue";
 import { penaltyApi } from "../api";
 import Penalty from "../types/penalty";
+import Upload from "../components/Upload.vue";
+
 export default Vue.extend({
   components: {
     Layout,
+    Upload,
   },
   data() {
     return {
@@ -82,7 +104,7 @@ export default Vue.extend({
         { text: "벌금", value: "paper" },
         { text: "Payed", value: "payed" },
       ],
-      penaltys: [] as Penalty[],
+      penaltys: null as Penalty[],
     };
   },
   async created() {

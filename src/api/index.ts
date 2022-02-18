@@ -24,6 +24,21 @@ export const userApi = {
     api.post("/user/logout", { withCredentials: true }),
   getUserById: (id: number): Promise<AxiosResponse<Data>> =>
     api.get(`/user/${id}`, { withCredentials: true }),
+  setUserImg: (
+    formData: FormData,
+    type: string
+  ): Promise<AxiosResponse<Data>> => {
+    return api.post(`/user/img/${type}`, formData);
+  },
+  resetUserBack: (): Promise<AxiosResponse<Data>> =>
+    api.post("/user/back/reset"),
+  editUserProfile: (
+    userId: string,
+    pw: string,
+    name: string
+  ): Promise<AxiosResponse<Data>> => api.put("/user", { userId, pw, name }),
+  follow: (id: string, isFollow: boolean): Promise<AxiosResponse<Data>> =>
+    api.post("/user/follow", { id, isFollow }),
 };
 
 export const postApi = {
@@ -52,6 +67,8 @@ export const penaltyApi = {
     api.get("/penalty", { withCredentials: true }),
   checkPaid: (id: number, payed: boolean): Promise<AxiosResponse<Data>> =>
     api.post("/penalty/check", { id, payed }, { withCredentials: true }),
+  getRecordsByUserId: (UserId: number): Promise<AxiosResponse<Data>> =>
+    api.get(`/penalty/${UserId}`),
 };
 
 export const prayApi = {
@@ -62,4 +79,8 @@ export const prayApi = {
     api.put("pray", { id, content }),
   deletePray: (id: number): Promise<AxiosResponse<Data>> =>
     api.delete(`pray/${id}`),
+  getPraysByUserId: (
+    UserId: number,
+    lastId: number
+  ): Promise<AxiosResponse<Data>> => api.get(`pray/${UserId}/${lastId}`),
 };

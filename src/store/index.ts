@@ -16,14 +16,19 @@ export default new Vuex.Store({
     };
   },
   mutations: {
+    CHANGE_NAME(state: State, name: string) {
+      state.user = { ...state.user, name };
+    },
+    CHANGE_IMG(state: State, img: string) {
+      state.user = { ...state.user, img };
+    },
     SET_USER(state: State, user: User) {
       // state.user = user;
       state.user = user;
     },
     DELETE_USER(state: State, status: Record<string, unknown>) {
-      if (status.code == 200) {
-        state.user = null;
-      }
+      console.log(status);
+      state.user = null;
     },
   },
   actions: {

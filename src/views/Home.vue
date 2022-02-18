@@ -18,32 +18,50 @@
           </v-col>
         </v-row>
       </transition>
-      <v-row v-if="!more" style="height: 30px"> </v-row>
-      <v-row v-for="(tweet, index) in tweets" :key="index" class="mt-0">
-        <v-col
-          cols="12"
-          class="py-0"
-          transition="scroll-y-transition"
-          style="position: relative"
+      <template v-if="tweets != null">
+        <v-row v-if="!more" style="height: 30px"> </v-row>
+        <v-row v-for="(tweet, index) in tweets" :key="index" class="mt-0">
+          <v-col
+            cols="12"
+            class="py-0"
+            transition="scroll-y-transition"
+            style="position: relative"
+          >
+            <tweet :tweet="tweet" :isMyTweet="false" />
+          </v-col>
+        </v-row>
+        <v-row
+          justify="center"
+          class="pt-5"
+          :style="isItSmall ? `margin-bottom:76px` : `padding-bottom:20px`"
         >
-          <tweet :tweet="tweet" />
-        </v-col>
-      </v-row>
-      <v-row
-        justify="center"
-        class="pt-5"
-        :style="isItSmall ? `margin-bottom:76px` : `padding-bottom:20px`"
-      >
-        <v-col cols="auto" class="py-0" v-if="!isThereNothing">
-          <v-btn color="primary" rounded @click="reloadTweets">더보기</v-btn>
-        </v-col>
-        <v-col cols="8" class="py-0" v-else>
-          <v-alert type="warning" dark> 로드할 피드가 없습니다. </v-alert>
-        </v-col>
-      </v-row>
+          <v-col cols="auto" class="py-0" v-if="!isThereNothing">
+            <v-btn color="primary" rounded @click="reloadTweets">더보기</v-btn>
+          </v-col>
+          <v-col cols="8" class="py-0" v-else>
+            <v-alert type="warning" dark> 로드할 피드가 없습니다. </v-alert>
+          </v-col>
+        </v-row>
+      </template>
+      <template v-else>
+        <div
+          class="mt-6 d-flex justify-center pt-8"
+          style="margin-bottom: 68px"
+        >
+          <v-progress-circular
+            indeterminate
+            color="primary"
+            :size="70"
+            :width="7"
+          ></v-progress-circular>
+        </div>
+      </template>
     </template>
     <template v-slot:layout-subContent>
       <span>asd</span>
+    </template>
+    <template v-slot:upload>
+      <upload />
     </template>
   </Layout>
 </template>
@@ -55,24 +73,24 @@ import TweetType from "../types/tweet";
 import { postApi } from "../api";
 import bus from "../util/bus";
 import Layout from "../components/Layout.vue";
+import Upload from "../components/Upload.vue";
+
 export default Vue.extend({
-  props: {
-    isItSmall: {
-      type: Boolean,
-      required: true,
-    },
-  },
   components: {
     Tweet,
     Layout,
+    Upload,
   },
   data() {
     return {
-      tweets: [] as Array<TweetType>,
+      tweets: null as Array<TweetType>,
       isThereNothing: false,
       more: false,
       number: 0,
     };
+  },
+  beforeUpdate() {
+    console.log("home update");
   },
   async created() {
     // webSocket.onmessage = function (event) {
@@ -120,7 +138,19 @@ export default Vue.extend({
         this.tweets = data.meta;
         bus.$emit("reload:tweets");
       } catch (e) {
-        console.log(e);
+        if (e.toString().substring(e.toString().length - 3) == "401") {
+          try {
+            bus.$emit("delete:user");
+
+            location.href = "/error/401";
+          } catch (e) {
+            console.log(e);
+          }
+        } else {
+          this.$router.push(
+            `/error/${e.toString().substring(e.toString().length - 3)}`
+          );
+        }
       }
     },
     removeTweet(id: number) {
@@ -140,6 +170,11 @@ export default Vue.extend({
     bus.$off("delete:tweet", this.removeTweet);
     bus.$off("get:tweets", this.getTweets);
     bus.$off("set:more", this.setMore);
+  },
+  computed: {
+    isItSmall() {
+      return this.$vuetify.breakpoint.smAndDown;
+    },
   },
 });
 </script>

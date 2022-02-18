@@ -10,7 +10,7 @@ import User from "../views/User.vue";
 import Tweets from "../views/Tweets.vue";
 import Prays from "../views/Prays.vue";
 import Penaltys from "../views/Penaltys.vue";
-
+import Error from "../views/Error.vue";
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
@@ -110,7 +110,19 @@ const routes: Array<RouteConfig> = [
     props: true,
     component: Penalty,
   },
-
+  {
+    path: "/error/:type",
+    name: "에러",
+    meta: {
+      isMenu: false,
+      layout: "Empty",
+      requireAuth: true,
+      icon: "mdi mdi-cash-multiple",
+      bottom: false,
+    },
+    props: true,
+    component: Error,
+  },
   // {
   //   path: "/search/:keyword",
   //   name: "검색",
@@ -130,6 +142,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  console.log("move!!!!");
   const currentUser = store.state.user;
   const requireAuth = to.matched.some((record) => record.meta.requireAuth);
   if (requireAuth && !currentUser) {

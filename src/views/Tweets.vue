@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-3" style="margin-bottom: 68px">
+  <div class="mt-3" style="margin-bottom: 68px" v-if="loading">
     <v-row v-for="(tweet, index) in tweets" :key="index" class="mt-0">
       <v-col
         cols="12"
@@ -7,7 +7,10 @@
         transition="scroll-y-transition"
         style="position: relative"
       >
-        <tweet :tweet="tweet" />
+        <tweet
+          :tweet="tweet"
+          :isMyTweet="parseInt($route.params.id, 10) == $store.state.user.id"
+        />
       </v-col>
     </v-row>
     <v-row justify="center" class="py-5">
@@ -21,6 +24,18 @@
       </v-col>
     </v-row>
   </div>
+  <div
+    class="mt-6 d-flex justify-center pt-8"
+    style="margin-bottom: 68px"
+    v-else
+  >
+    <v-progress-circular
+      indeterminate
+      color="primary"
+      :size="50"
+      :width="5"
+    ></v-progress-circular>
+  </div>
 </template>
 
 <script lang="ts">
@@ -32,7 +47,11 @@ import bus from "../util/bus";
 
 export default Vue.extend({
   data() {
-    return { tweets: [] as Array<TweetType>, isThereNothing: false };
+    return {
+      tweets: [] as Array<TweetType>,
+      isThereNothing: false,
+      loading: false,
+    };
   },
   components: {
     Tweet,
@@ -42,8 +61,14 @@ export default Vue.extend({
       return this.$vuetify.breakpoint.smAndDown;
     },
   },
+  watch: {
+    $route() {
+      this.getOwnTweets();
+    },
+  },
   async created() {
-    this.getOwnTweets();
+    console.log("im recreated!");
+    await this.getOwnTweets();
     bus.$on("get:tweets", this.getOwnTweets);
     bus.$on("delete:tweet", this.removeTweet);
   },
@@ -52,7 +77,7 @@ export default Vue.extend({
       try {
         const { data } = await postApi.getOwnTweets(
           this.tweets[this.tweets.length - 1].id,
-          this.$store.state.user.id
+          parseInt(this.$route.params.id, 10)
         );
         if (data.meta.length == 5) {
           this.isThereNothing = false;
@@ -67,10 +92,12 @@ export default Vue.extend({
 
     async getOwnTweets() {
       try {
+        this.loading = false;
         const { data } = await postApi.getOwnTweets(
           0,
-          this.$store.state.user.id
+          parseInt(this.$route.params.id, 10)
         );
+        this.loading = true;
         this.tweets = data.meta;
         if (data.meta.length == 5) {
           this.isThereNothing = false;

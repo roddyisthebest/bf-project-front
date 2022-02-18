@@ -10,12 +10,15 @@
     <v-card-text>
       <v-row>
         <v-col cols="auto">
-          <v-avatar class="mt-3"> <img :src="tweet.User.img" /> </v-avatar
+          <v-avatar class="mt-3">
+            <img
+              :src="isMyTweet ? $store.state.user.img : tweet.User.img"
+            /> </v-avatar
         ></v-col>
         <v-col style="flex: 1" class="px-4">
           <v-row class="d-flex align-center pt-5">
             <span class="font-weight-black text-h6 pl-2">{{
-              tweet.User.name
+              isMyTweet ? $store.state.user.name : tweet.User.name
             }}</span>
             <span class="text-subtitle1 pl-2">@{{ tweet.User.provider }}</span>
             <span class="text-subtitle1 pl-2"
@@ -68,6 +71,10 @@ export default Vue.extend({
   },
   props: {
     tweet: {} as PropType<Tweet>,
+    isMyTweet: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
     return { moment };

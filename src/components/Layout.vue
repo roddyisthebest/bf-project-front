@@ -6,6 +6,7 @@
     <div class="flex-3" v-if="!isItSmall">
       <slot name="layout-subContent"></slot>
     </div>
+    <slot name="upload"></slot>
   </div>
 </template>
 
@@ -39,6 +40,7 @@ export default Vue.extend({
   width: 100%;
   display: flex;
   height: 100vh;
+  position: relative;
 }
 .flex-7 {
   flex: 6;

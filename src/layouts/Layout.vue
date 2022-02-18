@@ -13,6 +13,7 @@ export default Vue.extend({
   components: { Default, Empty },
   computed: {
     setLayout(): string {
+      console.log(this.meta);
       return this.meta;
     },
   },
