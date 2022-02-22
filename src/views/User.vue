@@ -45,28 +45,22 @@
               </v-btn>
             </v-col>
             <v-col cols="auto" class="mr-2" v-else>
-              <v-hover v-slot="{ hover }">
-                <v-btn
-                  rounded
-                  :color="isItFollow ? `#cfd9de` : `black`"
-                  :outlined="isItFollow"
-                  class="mx-3"
-                  @click="follow"
+              <v-btn
+                rounded
+                dark
+                :color="isItFollow ? `#cfd9de` : `black`"
+                :outlined="isItFollow"
+                class="mx-3"
+                @click="follow"
+                :loading="followLoading"
+              >
+                <span
+                  :class="
+                    isItFollow ? `black--text ` : `white--text font-weight-bold`
+                  "
+                  >{{ isItFollow ? `following` : `follow` }}</span
                 >
-                  <span
-                    :class="
-                      isItFollow
-                        ? hover
-                          ? `red--text`
-                          : `black--text`
-                        : `white--text font-weight-bold`
-                    "
-                    >{{
-                      isItFollow ? (hover ? `unfollow` : `following`) : `follow`
-                    }}</span
-                  >
-                </v-btn>
-              </v-hover>
+              </v-btn>
             </v-col>
           </v-row>
           <v-row class="px-8" style="flex-direction: column">
@@ -271,6 +265,7 @@
                       dark
                       rounded
                       @click="saveProfile"
+                      :loading="saveloading"
                       >Save</v-btn
                     >
                   </v-col>
@@ -414,6 +409,7 @@ import moment from "moment";
 import { Cropper } from "vue-advanced-cropper";
 import "vue-advanced-cropper/dist/style.css";
 import Upload from "../components/Upload.vue";
+import { manageError } from "../util/func";
 
 export default Vue.extend({
   data() {
@@ -434,6 +430,8 @@ export default Vue.extend({
       isItFollow: false,
       follower: null as number,
       fromUsertoUser: false,
+      saveloading: false,
+      followLoading: false,
     };
   },
   components: {
@@ -490,11 +488,13 @@ export default Vue.extend({
         this.overlayImg = !this.overlayImg;
         console.log(this.ratio);
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
     async saveProfile() {
       try {
+        this.saveloading = true;
         if (
           !this.backImg.includes("http://localhost:8001/") &&
           this.backImg.length != 0
@@ -510,7 +510,13 @@ export default Vue.extend({
           this.user = { ...this.user, background: "" };
         }
 
-        if (!this.userImg.includes("http://localhost:8001/")) {
+        if (
+          !(
+            this.userImg.includes("http://localhost:8001/") ||
+            this.userImg.includes("kakao") ||
+            this.userImg.includes("https")
+          )
+        ) {
           const { data } = await userApi.setUserImg(this.formDataUser, "user");
           this.user = { ...this.user, img: data.meta };
           this.$store.commit("CHANGE_IMG", data.meta);
@@ -531,7 +537,10 @@ export default Vue.extend({
         this.formDataBack = null;
         this.formDataUser = null;
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
+      } finally {
+        this.saveloading = false;
       }
     },
     setFormData(url: string, isBack: boolean) {
@@ -573,11 +582,13 @@ export default Vue.extend({
         this.name = this.$store.state.user.name;
         console.log("setData");
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
     async follow() {
       try {
+        this.followLoading = true;
         const { data } = await userApi.follow(
           this.$route.params.id,
           !this.isItFollow
@@ -590,7 +601,10 @@ export default Vue.extend({
         }
         console.log(data);
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
+      } finally {
+        this.followLoading = false;
       }
     },
   },

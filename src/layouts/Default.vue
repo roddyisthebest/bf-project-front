@@ -93,7 +93,6 @@ import Route from "../types/route";
 
 import router from "../router";
 import userInfo from "../components/userInfo.vue";
-import ImagePreview from "../components/ImagePreview.vue";
 import bus from "../util/bus";
 
 import io from "socket.io-client";
@@ -112,7 +111,6 @@ export default Vue.extend({
   },
   components: {
     userInfo,
-    ImagePreview,
   },
   beforeMount() {
     this.items = router.options.routes;

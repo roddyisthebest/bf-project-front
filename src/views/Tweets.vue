@@ -13,13 +13,21 @@
         />
       </v-col>
     </v-row>
+    <v-snackbar v-model="snackBar" :timeout="2000">
+      Delete completed!
+      <template v-slot:action="{ attrs }">
+        <v-btn color="red" text v-bind="attrs" @click="snackBar = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
     <v-row justify="center" class="py-5">
       <v-col cols="auto" class="py-0" v-if="!isThereNothing">
         <v-btn color="primary" rounded @click="reloadTweets">더보기</v-btn>
       </v-col>
-      <v-col cols="8" class="py-0" v-else>
+      <v-col cols="10" class="py-0" v-else>
         <v-alert type="warning" dark class="mb-0">
-          로드할 피드가 없습니다.
+          최근 2주동안의 피드가 없습니다.
         </v-alert>
       </v-col>
     </v-row>
@@ -51,6 +59,7 @@ export default Vue.extend({
       tweets: [] as Array<TweetType>,
       isThereNothing: false,
       loading: false,
+      snackBar: false,
     };
   },
   components: {
@@ -109,7 +118,7 @@ export default Vue.extend({
       }
     },
     removeTweet(id: number) {
-      console.log(id);
+      this.snackBar = true;
       this.tweets = this.tweets.filter((e) => e.id != id);
     },
   },

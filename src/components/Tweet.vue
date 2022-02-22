@@ -48,7 +48,7 @@
         v-if="getMyInfo.id == tweet.User.id"
       >
         <v-col cols="auto" class="pa-1">
-          <v-btn icon color="pink" @click="deleteTweet">
+          <v-btn icon color="pink" @click="deleteTweet" :loading="loading">
             <v-icon>mdi mdi-delete</v-icon>
           </v-btn>
         </v-col>
@@ -77,7 +77,7 @@ export default Vue.extend({
     },
   },
   data() {
-    return { moment };
+    return { moment, loading: false };
   },
   computed: {
     getMyInfo(): User {
@@ -87,10 +87,13 @@ export default Vue.extend({
   methods: {
     async deleteTweet() {
       try {
+        this.loading = true;
         const { data } = await postApi.deleteTweet(this.tweet.id);
         bus.$emit("delete:tweet", this.tweet.id);
       } catch (e) {
         console.log(e);
+      } finally {
+        this.loading = false;
       }
     },
   },

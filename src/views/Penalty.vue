@@ -10,7 +10,7 @@
         </v-col>
       </v-row>
 
-      <template v-if="penaltys != null">
+      <template v-if="!loading">
         <v-row
           :style="isItSmall ? `margin-bottom:116px` : `padding-bottom:20px`"
           justify="center"
@@ -39,6 +39,7 @@
                     x-small
                     readOnly
                     icon
+                    :loading="item.loading"
                     :color="item.payed ? 'success' : 'red'"
                     @click="setPaid(index, item.id)"
                     v-if="amIAdmin"
@@ -85,6 +86,7 @@ import Layout from "../components/Layout.vue";
 import { penaltyApi } from "../api";
 import Penalty from "../types/penalty";
 import Upload from "../components/Upload.vue";
+import { manageError } from "../util/func";
 
 export default Vue.extend({
   components: {
@@ -102,17 +104,23 @@ export default Vue.extend({
           value: "User",
         },
         { text: "벌금", value: "paper" },
-        { text: "Payed", value: "payed" },
+        { text: "Paid", value: "payed" },
       ],
-      penaltys: null as Penalty[],
+      penaltys: [] as Penalty[],
+      loading: false,
     };
   },
   async created() {
     try {
+      this.loading = true;
       const { data } = await penaltyApi.getPenaltys();
-      this.penaltys = data.meta;
+      data.meta.map((penalty: Penalty) => {
+        this.penaltys = [...this.penaltys, { ...penalty, loading: false }];
+      });
+      this.loading = false;
     } catch (e) {
-      console.log(e);
+      const error = e.toString().substring(e.toString().length - 3);
+      manageError(error);
     }
   },
   computed: {
@@ -126,6 +134,10 @@ export default Vue.extend({
   methods: {
     async setPaid(id: number, penaltyId: number) {
       try {
+        this.penaltys.splice(id, 1, {
+          ...this.penaltys[id],
+          loading: !this.penaltys[id].loading,
+        });
         const { data } = await penaltyApi.checkPaid(
           penaltyId,
           !this.penaltys[id].payed
@@ -133,9 +145,11 @@ export default Vue.extend({
         this.penaltys.splice(id, 1, {
           ...this.penaltys[id],
           payed: !this.penaltys[id].payed,
+          loading: !this.penaltys[id].loading,
         });
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
   },

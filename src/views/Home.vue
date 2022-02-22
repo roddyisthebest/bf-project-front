@@ -38,10 +38,20 @@
           <v-col cols="auto" class="py-0" v-if="!isThereNothing">
             <v-btn color="primary" rounded @click="reloadTweets">더보기</v-btn>
           </v-col>
-          <v-col cols="8" class="py-0" v-else>
-            <v-alert type="warning" dark> 로드할 피드가 없습니다. </v-alert>
+          <v-col cols="10" class="py-0" v-else>
+            <v-alert type="warning" dark
+              >최근 2주동안의 피드가 없습니다.</v-alert
+            >
           </v-col>
         </v-row>
+        <v-snackbar v-model="snackbar" :timeout="2000">
+          Delete completed!
+          <template v-slot:action="{ attrs }">
+            <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
+              Close
+            </v-btn>
+          </template>
+        </v-snackbar>
       </template>
       <template v-else>
         <div
@@ -74,6 +84,7 @@ import { postApi } from "../api";
 import bus from "../util/bus";
 import Layout from "../components/Layout.vue";
 import Upload from "../components/Upload.vue";
+import { manageError } from "../util/func";
 
 export default Vue.extend({
   components: {
@@ -87,11 +98,10 @@ export default Vue.extend({
       isThereNothing: false,
       more: false,
       number: 0,
+      snackbar: false,
     };
   },
-  beforeUpdate() {
-    console.log("home update");
-  },
+
   async created() {
     // webSocket.onmessage = function (event) {
     //   console.log(event.data);
@@ -104,7 +114,8 @@ export default Vue.extend({
 
       bus.$on("delete:tweet", this.removeTweet);
     } catch (e) {
-      console.log(e);
+      const error = e.toString().substring(e.toString().length - 3);
+      manageError(error);
     }
   },
 
@@ -121,7 +132,8 @@ export default Vue.extend({
         }
         this.tweets = [...this.tweets, ...data.meta];
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
     async getTweets() {
@@ -138,24 +150,13 @@ export default Vue.extend({
         this.tweets = data.meta;
         bus.$emit("reload:tweets");
       } catch (e) {
-        if (e.toString().substring(e.toString().length - 3) == "401") {
-          try {
-            bus.$emit("delete:user");
-
-            location.href = "/error/401";
-          } catch (e) {
-            console.log(e);
-          }
-        } else {
-          this.$router.push(
-            `/error/${e.toString().substring(e.toString().length - 3)}`
-          );
-        }
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
     removeTweet(id: number) {
-      console.log(id);
       this.tweets = this.tweets.filter((e) => e.id != id);
+      this.snackbar = true;
     },
     setMore() {
       this.more = true;

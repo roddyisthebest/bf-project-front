@@ -46,6 +46,7 @@ import PrayList from "../components/PrayList.vue";
 import { prayApi } from "../api";
 import User from "../types/user";
 import Upload from "../components/Upload.vue";
+import { manageError } from "../util/func";
 
 export default Vue.extend({
   data() {
@@ -61,7 +62,8 @@ export default Vue.extend({
       const { data } = await prayApi.getPrays();
       this.prays = data.meta;
     } catch (e) {
-      console.log(e);
+      const error = e.toString().substring(e.toString().length - 3);
+      manageError(error);
     }
   },
 });

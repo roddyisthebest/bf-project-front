@@ -56,6 +56,7 @@
                     rounded
                     @click="postTweet"
                     :disabled="content.length == 0 && url.length == 0"
+                    :loading="loading"
                   >
                     올리기
                   </v-btn>
@@ -134,6 +135,7 @@ export default Vue.extend({
       dialogError: false,
       socket: io("localhost:8001"),
       formData: null as FormData,
+      loading: false,
     };
   },
   created() {
@@ -170,6 +172,7 @@ export default Vue.extend({
     },
     async postTweet() {
       try {
+        this.loading = true;
         if (this.formData != null) {
           var { data: image } = await postApi.postImage(this.formData);
         }
@@ -193,6 +196,8 @@ export default Vue.extend({
           this.dialogWrap = true;
           this.dialogError = false;
         }
+      } finally {
+        this.loading = false;
       }
     },
     click() {

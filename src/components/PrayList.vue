@@ -30,10 +30,8 @@
                 color="green"
                 small
                 v-if="item.edit"
-                @click="
-                  item.edit = !item.edit;
-                  updateItem(item.id, index);
-                "
+                :loading="item.updateLoading"
+                @click="updateItem(item.id, index)"
               >
                 <v-icon small> mdi mdi-content-save </v-icon>
               </v-btn>
@@ -46,7 +44,13 @@
               >
                 <v-icon small>mdi mdi-lead-pencil</v-icon>
               </v-btn>
-              <v-btn icon color="red" small @click="deleteItem(item.id, index)">
+              <v-btn
+                icon
+                color="red"
+                small
+                :loading="item.deleteLoading"
+                @click="deleteItem(item.id, index)"
+              >
                 <v-icon small>mdi mdi-delete</v-icon>
               </v-btn>
             </template></v-textarea
@@ -55,7 +59,9 @@
       </v-row>
       <v-row justify="center">
         <v-col cols="12" class="d-flex justify-center">
-          <v-btn @click="addItem(user.id)"> 추가하기 </v-btn>
+          <v-btn @click="addItem(user.id)" :loading="addLoading">
+            추가하기
+          </v-btn>
         </v-col>
       </v-row>
     </v-card-text>
@@ -80,36 +86,56 @@ export default Vue.extend({
       hasSaved: false,
       isEditing: null,
       list: [],
+      addLoading: false,
     };
   },
 
   methods: {
     async addItem(UserId: number) {
       try {
+        this.addLoading = true;
         const { data } = await prayApi.createPray(
           UserId,
           "새로운 기도제목 입니다."
         );
-        console.log(data.meta);
         this.list = [
           ...this.list,
-          { content: "새로운 기도제목입니다.", edit: false, id: data.meta },
+          {
+            content: "새로운 기도제목입니다.",
+            edit: false,
+            id: data.meta,
+            deleteLoading: false,
+            updateLoading: false,
+          },
         ];
       } catch (e) {
         console.log(e);
+      } finally {
+        this.addLoading = false;
       }
     },
     async updateItem(id: number, index: number) {
       try {
+        this.list.splice(index, 1, {
+          ...this.list[index],
+          updateLoading: true,
+        });
         const { data } = await prayApi.updatePray(id, this.list[index].content);
-        console.log(id, this.list[index].content);
-        console.log(data);
+        this.list.splice(index, 1, {
+          ...this.list[index],
+          updateLoading: false,
+          edit: false,
+        });
       } catch (e) {
         console.log(e);
       }
     },
     async deleteItem(id: number, index: number) {
       try {
+        this.list.splice(index, 1, {
+          ...this.list[index],
+          deleteLoading: true,
+        });
         const { data } = await prayApi.deletePray(id);
         this.list.splice(index, 1);
       } catch (e) {
@@ -120,7 +146,10 @@ export default Vue.extend({
 
   created() {
     this.user.Prays.map((e) => {
-      this.list = [...this.list, { ...e, edit: false }];
+      this.list = [
+        ...this.list,
+        { ...e, edit: false, deleteLoading: false, updateLoading: false },
+      ];
     });
     this.list = this.list.filter((e) => e.content != "default");
     console.log(this.list);
