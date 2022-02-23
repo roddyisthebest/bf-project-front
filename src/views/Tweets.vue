@@ -52,6 +52,7 @@ import { postApi } from "../api";
 import TweetType from "../types/tweet";
 import Tweet from "../components/Tweet.vue";
 import bus from "../util/bus";
+import { manageError } from "../util/func";
 
 export default Vue.extend({
   data() {
@@ -95,7 +96,8 @@ export default Vue.extend({
         }
         this.tweets = [...this.tweets, ...data.meta];
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
 
@@ -114,7 +116,8 @@ export default Vue.extend({
           this.isThereNothing = true;
         }
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
     removeTweet(id: number) {

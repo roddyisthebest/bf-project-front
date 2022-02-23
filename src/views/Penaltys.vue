@@ -51,6 +51,8 @@
 import Vue from "vue";
 import Penalty from "../types/penalty";
 import { penaltyApi } from "../api";
+import { manageError } from "../util/func";
+
 export default Vue.extend({
   data() {
     return {
@@ -84,7 +86,8 @@ export default Vue.extend({
       this.average = this.fee / data.meta.length;
       this.penaltys = data.meta;
     } catch (e) {
-      console.log(e);
+      const error = e.toString().substring(e.toString().length - 3);
+      manageError(error);
     }
   },
 });

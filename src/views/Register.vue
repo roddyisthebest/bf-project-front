@@ -106,6 +106,8 @@
 <script lang="ts">
 import Vue from "vue";
 import { userApi } from "../api";
+import { manageError } from "../util/func";
+
 export default Vue.extend({
   data: () => ({
     alignments: ["start", "center", "end"],
@@ -146,6 +148,9 @@ export default Vue.extend({
         if (e.toString().substring(e.toString().length - 3) == "403") {
           this.dialogWrap = true;
           this.dialogError = false;
+        } else {
+          const error = e.toString().substring(e.toString().length - 3);
+          manageError(error);
         }
       }
     },

@@ -66,15 +66,22 @@
 
     <v-row justify="center">
       <v-col cols="auto" class="py-0">
-        <router-link to="/register">가입하기</router-link>
-      </v-col>
-      <v-col cols="auto " class="py-0">
-        <router-link to="/register">아이디 찾기</router-link>
-      </v-col>
-      <v-col cols="auto" class="py-0">
-        <router-link to="/register">비밀번호 찾기</router-link>
+        Don't have an account?
+        <router-link to="/register">Register</router-link>
       </v-col>
     </v-row>
+    <v-snackbar v-model="snackbar" :timeout="2000">
+      {{
+        errorType == "401"
+          ? `등록된 계정이 아닙니다.`
+          : `${errorType} 오류 입니다 `
+      }}
+      <template v-slot:action="{ attrs }">
+        <v-btn color="red" text v-bind="attrs" @click="snackbar = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -93,6 +100,8 @@ export default Vue.extend({
       google: `https://accounts.google.com/o/oauth2/auth?client_id=${process.env.VUE_APP_CLIENT_ID_GOOGLE}&&redirect_uri=${process.env.VUE_APP_CALLBACK_URL_GOOGLE}&scope=profile&response_type=code&accessType=online&prompt=consent`,
       kakao: `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.VUE_APP_CLIENT_ID_KAKAO_ID}&redirect_uri=${process.env.VUE_APP_CALLBACK_URL_KAKAO}&response_type=code`,
     },
+    snackbar: false,
+    errorType: "",
   }),
   methods: {
     async login(id: string, pw: string) {
@@ -101,13 +110,10 @@ export default Vue.extend({
           const data = await userApi.login(id, pw);
           if (data.status == 200) {
             this.getUser();
-            // await this.$store.dispatch("FETCH_USER");
-            // location.href = "http://localhost:8080/";
           }
         } catch (e) {
-          if (e.toString().includes("404")) {
-            console.log(e);
-          }
+          this.errorType = e.toString().substring(e.toString().length - 3);
+          this.snackbar = true;
         }
       }
     },
@@ -119,12 +125,10 @@ export default Vue.extend({
           location.href = "http://localhost:8080/";
         }
       } catch (e) {
-        console.log("세션 쿠키 없습니다.");
+        this.errorType = e.toString().substring(e.toString().length - 3);
+        this.snackbar = true;
       }
     },
-  },
-  created() {
-    this.getUser();
   },
 });
 </script>

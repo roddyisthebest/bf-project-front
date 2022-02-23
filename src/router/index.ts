@@ -11,6 +11,7 @@ import Tweets from "../views/Tweets.vue";
 import Prays from "../views/Prays.vue";
 import Penaltys from "../views/Penaltys.vue";
 import Error from "../views/Error.vue";
+import LoginPass from "../views/LoginPass.vue";
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
@@ -123,16 +124,19 @@ const routes: Array<RouteConfig> = [
     props: true,
     component: Error,
   },
-  // {
-  //   path: "/search/:keyword",
-  //   name: "검색",
-  //   meta: {
-  //     isMenu: true,
-  //     layout: "Default",
-  //     requireAuth: true,
-  //     icon: "mdi mdi-magnify",
-  //   },
-  // },
+  {
+    path: "/loginPass",
+    name: "로그인패스",
+    meta: {
+      isMenu: false,
+      layout: "Empty",
+      requireAuth: false,
+      icon: "mdi mdi-cash-multiple",
+      bottom: false,
+    },
+    props: false,
+    component: LoginPass,
+  },
 ];
 
 const router = new VueRouter({

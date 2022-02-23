@@ -10,11 +10,12 @@
     <v-card-text>
       <v-row>
         <v-col cols="auto">
-          <v-avatar class="mt-3">
-            <img
-              :src="isMyTweet ? $store.state.user.img : tweet.User.img"
-            /> </v-avatar
-        ></v-col>
+          <router-link :to="`/user/` + tweet.User.id">
+            <v-avatar class="mt-3">
+              <img :src="isMyTweet ? $store.state.user.img : tweet.User.img" />
+            </v-avatar>
+          </router-link>
+        </v-col>
         <v-col style="flex: 1" class="px-4">
           <v-row class="d-flex align-center pt-5">
             <span class="font-weight-black text-h6 pl-2">{{
@@ -65,6 +66,8 @@ import moment from "moment";
 import User from "../types/user";
 import { postApi } from "../api";
 import bus from "../util/bus";
+import { manageError } from "../util/func";
+
 export default Vue.extend({
   components: {
     ImagePreview,
@@ -91,7 +94,8 @@ export default Vue.extend({
         const { data } = await postApi.deleteTweet(this.tweet.id);
         bus.$emit("delete:tweet", this.tweet.id);
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       } finally {
         this.loading = false;
       }

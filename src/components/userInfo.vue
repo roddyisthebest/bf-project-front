@@ -74,13 +74,6 @@
         <v-list-item link @click="logout">
           <v-list-item-title>로그아웃</v-list-item-title>
         </v-list-item>
-
-        <v-list-item>
-          <v-list-item-action>
-            <v-switch v-model="hints" color="purple"></v-switch>
-          </v-list-item-action>
-          <v-list-item-title>show Concurrent Users</v-list-item-title>
-        </v-list-item>
       </v-list>
     </v-card>
   </v-menu>
@@ -88,6 +81,8 @@
 <script lang="ts">
 import Vue, { PropType } from "vue";
 import MyInfo from "../types/myInfo";
+import { manageError } from "../util/func";
+
 export default Vue.extend({
   props: {
     myInfo: {} as PropType<MyInfo>,
@@ -110,7 +105,8 @@ export default Vue.extend({
         const res = await this.$store.dispatch("DELETE_USER");
         location.href = "http://localhost:8080/login";
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
   },

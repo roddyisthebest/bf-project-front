@@ -76,7 +76,8 @@
 import Vue, { PropType } from "vue";
 import User from "../types/user";
 import { prayApi } from "../api";
-// import Pray from "../types/pray";
+import { manageError } from "../util/func";
+
 export default Vue.extend({
   props: {
     user: {} as PropType<User>,
@@ -109,7 +110,8 @@ export default Vue.extend({
           },
         ];
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       } finally {
         this.addLoading = false;
       }
@@ -127,7 +129,8 @@ export default Vue.extend({
           edit: false,
         });
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
     async deleteItem(id: number, index: number) {
@@ -139,7 +142,8 @@ export default Vue.extend({
         const { data } = await prayApi.deletePray(id);
         this.list.splice(index, 1);
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
   },
@@ -152,7 +156,6 @@ export default Vue.extend({
       ];
     });
     this.list = this.list.filter((e) => e.content != "default");
-    console.log(this.list);
   },
 });
 </script>

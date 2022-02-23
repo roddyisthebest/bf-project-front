@@ -55,6 +55,7 @@
 <script lang="ts">
 import Vue from "vue";
 import { prayApi } from "../api";
+import { manageError } from "../util/func";
 
 export default Vue.extend({
   data() {
@@ -77,7 +78,8 @@ export default Vue.extend({
         this.isThere = true;
       }
     } catch (e) {
-      console.log(e);
+      const error = e.toString().substring(e.toString().length - 3);
+      manageError(error);
     }
   },
   methods: {
@@ -95,7 +97,8 @@ export default Vue.extend({
         }
         this.list = [...this.list, ...data.meta];
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
   },

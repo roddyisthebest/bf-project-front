@@ -392,7 +392,9 @@
     </template>
 
     <template v-slot:layout-subContent>
-      <span>asd</span>
+      <v-row class="mt-2" justify="center">
+        <v-col cols="auto"> <introduce /> </v-col>
+      </v-row>
     </template>
     <template v-slot:upload>
       <upload />
@@ -409,6 +411,8 @@ import moment from "moment";
 import { Cropper } from "vue-advanced-cropper";
 import "vue-advanced-cropper/dist/style.css";
 import Upload from "../components/Upload.vue";
+import Introduce from "../components/Introduce.vue";
+
 import { manageError } from "../util/func";
 
 export default Vue.extend({
@@ -437,6 +441,7 @@ export default Vue.extend({
   components: {
     Layout,
     Upload,
+    Introduce,
   },
   async created() {
     await this.setUserInfo();

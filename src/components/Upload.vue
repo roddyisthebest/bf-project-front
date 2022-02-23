@@ -124,6 +124,8 @@ import Vue from "vue";
 import ImagePreview from "./ImagePreview.vue";
 import io from "socket.io-client";
 
+import { manageError } from "../util/func";
+
 export default Vue.extend({
   data() {
     return {
@@ -167,7 +169,8 @@ export default Vue.extend({
         this.imagePreview = true;
         this.url = URL.createObjectURL(this.$refs.imageInput.files[0]);
       } catch (e) {
-        console.log(e);
+        const error = e.toString().substring(e.toString().length - 3);
+        manageError(error);
       }
     },
     async postTweet() {
@@ -195,6 +198,9 @@ export default Vue.extend({
           this.reset();
           this.dialogWrap = true;
           this.dialogError = false;
+        } else {
+          const error = e.toString().substring(e.toString().length - 3);
+          manageError(error);
         }
       } finally {
         this.loading = false;
