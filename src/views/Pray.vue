@@ -10,7 +10,7 @@
         </v-col>
       </v-row>
       <template v-if="prays != null">
-        <v-row justify="center" class="pb-11">
+        <v-row justify="center" style="padding-bottom: 110px">
           <v-col cols="11">
             <pray-list v-for="pray in prays" :key="pray.id" :user="pray" />
           </v-col>

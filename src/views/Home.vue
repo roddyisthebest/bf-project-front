@@ -33,7 +33,7 @@
         <v-row
           justify="center"
           class="pt-5"
-          :style="isItSmall ? `margin-bottom:76px` : `padding-bottom:20px`"
+          :style="isItSmall ? `margin-bottom:140px` : `padding-bottom:20px`"
         >
           <v-col cols="auto" class="py-0" v-if="!isThereNothing">
             <v-btn color="primary" rounded @click="reloadTweets">더보기</v-btn>
@@ -107,10 +107,6 @@ export default Vue.extend({
   },
 
   async created() {
-    // webSocket.onmessage = function (event) {
-    //   console.log(event.data);
-    //   webSocket.send("클라이언트에서 서버로 답장을 보냅니다.");
-    // };
     try {
       this.getTweets();
       bus.$on("get:tweets", this.getTweets);

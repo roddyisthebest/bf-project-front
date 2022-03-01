@@ -18,7 +18,7 @@
                 :style="
                   user.background.length == 0
                     ? `background-image:url(${user.background})`
-                    : `background-image:url(http://localhost:8001${user.background})`
+                    : `background-image:url(${baseUrl}${user.background})`
                 "
               >
                 <v-avatar
@@ -186,8 +186,6 @@
                       @click="
                         overlayImg = !overlayImg;
                         $refs.img.value = '';
-                        formDataBack = null;
-                        formDataUser = null;
                       "
                     >
                       <v-icon>mdi mdi-arrow-left </v-icon>
@@ -412,6 +410,7 @@ import { Cropper } from "vue-advanced-cropper";
 import "vue-advanced-cropper/dist/style.css";
 import Upload from "../components/Upload.vue";
 import Introduce from "../components/Introduce.vue";
+import baseUrl from "../util/baseUrl";
 
 import { manageError } from "../util/func";
 
@@ -436,6 +435,7 @@ export default Vue.extend({
       fromUsertoUser: false,
       saveloading: false,
       followLoading: false,
+      baseUrl: "",
     };
   },
   components: {
@@ -449,6 +449,7 @@ export default Vue.extend({
       (user: User) => user.id == parseInt(this.$store.state.user.id, 10)
     );
     this.follower = this.user.Followers.length;
+    this.baseUrl = baseUrl;
   },
   async beforeUpdate() {
     console.log("im update one");
@@ -500,10 +501,7 @@ export default Vue.extend({
     async saveProfile() {
       try {
         this.saveloading = true;
-        if (
-          !this.backImg.includes("http://localhost:8001/") &&
-          this.backImg.length != 0
-        ) {
+        if (!this.backImg.includes(baseUrl) && this.backImg.length != 0) {
           const { data } = await userApi.setUserImg(
             this.formDataBack,
             "background"
@@ -517,7 +515,7 @@ export default Vue.extend({
 
         if (
           !(
-            this.userImg.includes("http://localhost:8001/") ||
+            this.userImg.includes(baseUrl) ||
             this.userImg.includes("kakao") ||
             this.userImg.includes("https")
           )
@@ -568,7 +566,7 @@ export default Vue.extend({
       this.overlayEdit = true;
       this.userImg = this.user.img;
       if (this.user.background != "") {
-        this.backImg = "http://localhost:8001" + this.user.background;
+        this.backImg = baseUrl + this.user.background;
       } else {
         this.backImg = "";
       }
@@ -582,7 +580,7 @@ export default Vue.extend({
         this.user = data.meta;
         this.userImg = this.user.img;
         if (this.user.background != "") {
-          this.backImg = "http://localhost:8001" + this.user.background;
+          this.backImg = baseUrl + this.user.background;
         }
         this.name = this.$store.state.user.name;
         console.log("setData");

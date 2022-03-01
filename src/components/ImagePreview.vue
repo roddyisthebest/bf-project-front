@@ -2,9 +2,9 @@
   <div
     v-if="url && url.length"
     id="container"
-    :style="`background-image:url(${
-      del ? '' : 'http://localhost:8001'
-    }${url} );  cursor:${del ? 'auto' : 'pointer'}`"
+    :style="`background-image:url(${del ? '' : baseUrl}${url} );  cursor:${
+      del ? 'auto' : 'pointer'
+    }`"
     @click="goImage"
   >
     <v-row>
@@ -22,8 +22,12 @@
   </div>
 </template>
 <script lang="ts">
+import baseUrl from "../util/baseUrl";
 import Vue from "vue";
 export default Vue.extend({
+  created() {
+    this.baseUrl = baseUrl;
+  },
   props: {
     url: {
       type: String,
@@ -37,9 +41,12 @@ export default Vue.extend({
   methods: {
     goImage() {
       if (!this.del) {
-        open("http://localhost:8001" + this.url);
+        open(this.baseUrl + this.url);
       }
     },
+  },
+  data() {
+    return { baseUrl: "" };
   },
 });
 </script>

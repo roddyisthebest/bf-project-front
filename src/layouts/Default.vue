@@ -74,9 +74,34 @@
                 ></user-info>
               </template>
               <template v-slot:title-info>
-                <span class="font-weight-black text-h6 px-4">{{
-                  getTitle
-                }}</span>
+                <span class="font-weight-black text-h6 px-4">
+                  <v-menu offset-y>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-btn icon color="primary" dark v-bind="attrs" v-on="on">
+                        <v-icon>mdi-menu</v-icon>
+                      </v-btn>
+                    </template>
+                    <v-list-item-group
+                      v-model="selectedItem"
+                      style="background-color: white"
+                    >
+                      <v-list-item
+                        v-for="(item, i) in leftMenu"
+                        :key="i"
+                        @click="goPage(item.path)"
+                        :disabled="$route.path == item.path"
+                      >
+                        <v-list-item-icon>
+                          <v-icon v-text="item.meta.icon"></v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content>
+                          <v-list-item-title
+                            v-text="item.name"
+                          ></v-list-item-title>
+                        </v-list-item-content>
+                      </v-list-item>
+                    </v-list-item-group> </v-menu
+                ></span>
               </template>
             </router-view>
           </transition>
@@ -97,6 +122,7 @@ import bus from "../util/bus";
 
 import io from "socket.io-client";
 
+import baseUrl from "../util/baseUrl";
 export default Vue.extend({
   name: "App",
 
@@ -106,7 +132,7 @@ export default Vue.extend({
       user: {} as User,
       selectedItem: 0,
       value: 0,
-      socket: io("localhost:8001"),
+      socket: io(baseUrl),
     };
   },
   components: {
@@ -120,6 +146,7 @@ export default Vue.extend({
         break;
       }
     }
+    console.log(this.items);
   },
 
   async created() {

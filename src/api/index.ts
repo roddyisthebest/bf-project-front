@@ -1,19 +1,21 @@
 import axios, { AxiosResponse } from "axios";
 import Data from "../types/data";
+import baseUrl from "../util/baseUrl";
 axios.defaults.withCredentials = true;
+
 const api = axios.create({
-  baseURL: "http://localhost:8001" as string,
+  baseURL: baseUrl as string,
 });
 
 export const userApi = {
   login: (userId: string, password: string): Promise<AxiosResponse<Data>> =>
-    api.post("/user/login", { userId, password }),
+    api.post("/user/login", { userId, password }, { withCredentials: true }),
   register: (
     userId: string,
     password: string,
     name: string
   ): Promise<AxiosResponse<Data>> =>
-    api.post("/user/", { userId, password, name }),
+    api.post("/user/", { userId, password, name }, { withCredentials: false }),
 
   loginWithGoogle: (): Promise<AxiosResponse<string, unknown>> =>
     api.get("/auth/google"),

@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-3" style="margin-bottom: 68px" v-if="loading">
+  <div class="mt-3" style="margin-bottom: 115px" v-if="loading">
     <v-row v-for="(tweet, index) in tweets" :key="index" class="mt-0">
       <v-col
         cols="12"

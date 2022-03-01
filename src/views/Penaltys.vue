@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-6" style="margin-bottom: 68px" v-if="penaltys != null">
+  <div class="mt-6" style="margin-bottom: 100px" v-if="penaltys != null">
     <v-row justify="center">
       <v-col cols="10">
         <v-card class="overflow-hidden mb-3" color="white lighten-1">

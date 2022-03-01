@@ -1,5 +1,5 @@
 <template>
-  <div class="mt-6" style="margin-bottom: 68px" v-if="loading">
+  <div class="mt-6" style="margin-bottom: 125px" v-if="loading">
     <v-row v-for="(item, index) in list" :key="index" justify="center">
       <v-col cols="11" class="px-2 py-0">
         <v-textarea

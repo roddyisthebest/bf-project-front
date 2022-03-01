@@ -35,6 +35,7 @@ export default new Vuex.Store({
     async FETCH_USER({ commit }: ActionContext<State, State>) {
       try {
         const res = await userApi.getUser();
+        console.log(res);
         commit("SET_USER", res.data);
         return res;
       } catch (e) {
